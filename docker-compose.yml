@@ -1,0 +1,25 @@
+services:
+  helloweb:
+    image: helloweb
+    build:
+      context: .
+      dockerfile: HelloWeb/Dockerfile
+    environment:
+      - ASPNETCORE_URLS=http://+:80;http://+:5001
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:5001/healthz || exit 1"]
+      interval: 10s
+      timeout: 3s
+      start_period: 10s
+  
+  test-web:
+    image: run-tests
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    environment:
+      - TEST_BASE_URL=http://helloweb
+    depends_on:
+      helloweb:
+        condition: service_healthy
