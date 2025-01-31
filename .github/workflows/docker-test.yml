@@ -2,6 +2,9 @@ name: Docker
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 env:
   IMAGE_NAME: ${{ github.repository }}
@@ -13,6 +16,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Build Docker images
-        run: docker compose build
-      - name: Test web in compose
-        run: docker compose up --exit-code-from test-web
+        run: docker build -f HelloWeb/Dockerfile -t helloweb:dev .
+      - name: Run container image
+        timeout-minutes: 1
+        run: |
+          containerid=$(docker run -d -p 8080:80 helloweb:dev)
+          until [ "`docker inspect -f {{.State.Health.Status}} $containerid`"=="healthy" ]; do
+            sleep 0.1;
+          done;
+      - name: Run tests
+        shell: pwsh
+        env:
+          TEST_BASE_URL: http://localhost:8080
+        run: ./tests/RunTests.ps1
