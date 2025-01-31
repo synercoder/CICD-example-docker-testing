@@ -28,5 +28,5 @@ jobs:
       - name: Run tests
         shell: pwsh
         env:
-          TEST_BASE_URL: http://localhost:$TEST_PORT
+          TEST_BASE_URL: http://localhost:${{ env.TEST_PORT }}
         run: ./tests/RunTests.ps1
