@@ -24,4 +24,9 @@ RUN dotnet publish "./HelloWeb.csproj" -c $BUILD_CONFIGURATION -o /app/publish /
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+ENV ASPNETCORE_URLS=http://+:80;http://+:5001
+ARG ASPNETCORE_ENVIRONMENT
+ENV ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
+  CMD curl --fail http://localhost:5001/healthz || exit 1
 ENTRYPOINT ["dotnet", "HelloWeb.dll"]
