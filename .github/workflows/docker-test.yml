@@ -17,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Build Docker images
-        run: docker build -f HelloWeb/Dockerfile -t helloweb:dev .
+        run: docker build -f HelloWeb/Dockerfile -t $IMAGE_NAME_TAG .
       - name: Run container image
         timeout-minutes: 1
         run: |
